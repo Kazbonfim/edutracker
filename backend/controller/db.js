@@ -1,29 +1,28 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise'); // usar promise
 require('dotenv').config();
 
-// Conexão global
-const connection = mysql.createConnection({
+// Pool de conexões
+const pool = mysql.createPool({
   host: 'mysql',
+  port: 3306,
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE,
-  port: 3306
-});
-
-// Testa a conexão uma vez
-connection.connect(err => {
-  if (err) console.error('❌ Erro ao conectar:', err.message);
-  else console.log('✅ Conectado ao MySQL do Discloud!');
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
 // Rota de exemplo
-router.get('/', (req, res) => {
-  connection.query('SHOW TABLES;', (err, results) => {
-    if (err) return res.status(500).json({ erro: err.message });
-    res.json(results);
-  });
+router.get('/', async (req, res) => {
+  try {
+    const [results] = await pool.query('SHOW TABLES;');
+    res.json({ tables: results });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
 });
 
 module.exports = router;
