@@ -1,0 +1,15 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# Logs
+*.log
+**/*.log
+
+# Environment variables
+.env
+**/.env
+
+# Demais arquivos
+backup/
+**/backup/
