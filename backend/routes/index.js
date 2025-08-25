@@ -1,14 +1,15 @@
+require('dotenv').config();
+
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2/promise');
-require('dotenv').config();
 
 // Pool de conexões
 const pool = mysql.createPool({
   host: 'mysql',
-  user: 'admin',
-  password: '32079147',
-  database: 'disclouddb',
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
   port: 3306,
   waitForConnections: true,
   connectionLimit: 10,
@@ -37,10 +38,10 @@ router.get('/', (req, res) => {
 router.get('/getdb', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM usuarios');
-    
+
     res.status(201).json({ usuarios: rows });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error });
   }
 });
 
@@ -55,7 +56,7 @@ router.post('/createUser', async (req, res) => {
       userId
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error });
   }
 });
 
