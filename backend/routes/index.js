@@ -6,11 +6,11 @@ const mysql = require('mysql2/promise');
 
 // Pool de conexões
 const pool = mysql.createPool({
-  host: '172.0.44.3',
+  host: 'mysql',
   port: 3306,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
+  user: 'admin',
+  password: '32079147',
+  database: 'disclouddb',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
