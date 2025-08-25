@@ -16,6 +16,14 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+pool.connect(err => {
+  if (err) console.error('❌ Erro ao conectar:', err.message);
+  else console.log('✅ Conectado ao MySQL do Discloud!');
+  waitForConnections: true,
+    connectionLimit: 10,
+      queueLimit: 0
+});
+
 // Função desacoplada pra inserir dados
 async function createUser(name, email) {
   if (!name || !email) {
