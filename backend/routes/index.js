@@ -4,6 +4,11 @@ const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2/promise');
 
+pool.connect(err => {
+  if (err) console.error('❌ Erro ao conectar:', err.message);
+  else console.log('✅ Conectado ao MySQL do Discloud!');
+});
+
 // Pool de conexões
 const pool = mysql.createPool({
   host: 'mysql',
@@ -14,14 +19,6 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-});
-
-pool.connect(err => {
-  if (err) console.error('❌ Erro ao conectar:', err.message);
-  else console.log('✅ Conectado ao MySQL do Discloud!');
-  waitForConnections: true,
-    connectionLimit: 10,
-      queueLimit: 0
 });
 
 // Função desacoplada pra inserir dados
