@@ -1,9 +1,62 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const mysql = require('mysql2/promise');
+require('dotenv').config();
 
-/* GET home page. */
-router.get('/', function (req, res, next) {
-  res.json({ message: "Conectado com sucesso!" })
+// Pool de conexões
+const pool = mysql.createPool({
+  host: 'mysql',
+  user: 'admin',
+  password: '32079147',
+  database: 'disclouddb',
+  port: 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
+// Função desacoplada pra inserir dados
+async function createUser(name, email) {
+  if (!name || !email) {
+    throw new Error("Nome e e-mail são obrigatórios!");
+  }
+
+  const sql = 'INSERT INTO usuarios (name, email) VALUES (?, ?)';
+  const [result] = await pool.query(sql, [name, email]);
+
+  // return result.insertId;
+  return result;
+}
+
+// Index
+router.get('/', (req, res) => {
+  res.json({ message: "Conectado com sucesso!" });
+});
+
+// Listar todos os usuários
+router.get('/getdb', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM usuarios');
+    
+    res.status(201).json({ usuarios: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Criar um usuário
+router.post('/createUser', async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    const userId = await createUser(name, email);
+
+    res.status(201).json({
+      message: "Usuário criado com sucesso!",
+      userId
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 module.exports = router;
