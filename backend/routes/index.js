@@ -6,7 +6,7 @@ const mysql = require('mysql2/promise');
 
 // Pool de conexões
 const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST || 'mysql',
+  host: process.env.MYSQL_HOST,
   port: process.env.MYSQL_PORT,
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
@@ -15,18 +15,6 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
 });
-
-// Função desacoplada pra inserir dados
-async function createUser(name, email) {
-  if (!name || !email) {
-    throw new Error("Nome e e-mail são obrigatórios!");
-  }
-
-  const sql = 'INSERT INTO usuarios (name, email) VALUES (?, ?)';
-  const [result] = await pool.query(sql, [name, email]);
-
-  return result.insertId; // retorna só o ID do usuário novo
-}
 
 // Index
 router.get('/', (req, res) => {
@@ -47,7 +35,15 @@ router.get('/getdb', async (req, res) => {
 router.post('/createUser', async (req, res) => {
   try {
     const { name, email } = req.body;
-    const userId = await createUser(name, email);
+    // const userId = await createUser(name, email);
+    if (!name || !email) {
+      console.error('Nome e e-mail são obrigatórios');
+    }
+
+    const sql = 'INSERT INTO usuarios (name, email) VALUES (? ,?)'
+
+    const [result] = await pool.query(sql, [name, email]);
+    const userId = result.insertId;
 
     res.status(201).json({
       message: "Usuário criado com sucesso!",
